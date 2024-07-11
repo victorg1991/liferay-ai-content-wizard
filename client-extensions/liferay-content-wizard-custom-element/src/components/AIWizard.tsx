@@ -18,7 +18,7 @@ type AIWizardProps = {
   modal: ReturnType<typeof useModal>;
 };
 
-const schema = z.object({ input: z.string() });
+const schema = z.object({ input: z.string(), image: z.string()});
 
 export type Schema = z.infer<typeof schema>;
 
@@ -44,11 +44,14 @@ export default function AIWizard({ modal }: AIWizardProps) {
     ref.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  async function onSubmit({ input }: Schema) {
+  async function onSubmit({ input }) {
     appendMessage({ text: input, role: 'user' });
+
+    console.log('entro');
 
     const response = await aiWizardContentOAuth2.generate({
       question: input,
+      image: document.getElementById("wizard-content-image")?.value
     });
 
     if (!response.ok) {

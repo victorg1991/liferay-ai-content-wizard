@@ -120,8 +120,10 @@ const FileExplorer = ({ selectedTree, setSelectedTree }: any) => {
 export default function ChatInput(props: Props) {
   const [files, setFiles] = useState([]);
   const [selectedTree, setSelectedTree] = useState();
+  const [image, setImage] = useState('');
   const { handleSubmit, formState, register, watch } = props.form;
   const formRef = useRef<HTMLFormElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const modal = useModal();
   const text = watch('input');
 
@@ -189,6 +191,34 @@ export default function ChatInput(props: Props) {
                 'Ask the Assistant to create a Liferay Asset'
               }
             />
+
+           {image ?  <img
+              width={150}
+              src={image}
+            /> : null
+          }
+
+            <ClayInput
+            {...register('image')}
+              value={image}
+              id="wizard-content-image"
+              type="hidden"
+            />
+
+          <ClayInput
+              ref={inputRef}
+              onChange={(event) => {
+                if (event.target.files?.[0]) {
+                  const reader = new FileReader();
+                  reader.readAsDataURL(event.target.files[0]);
+                  reader.onload = () => {
+                    setImage(reader.result as string)
+                  };
+                }
+              }}
+              className='d-none'
+              type="file"
+            />
           </ClayForm>
         </ClayLayout.ContentCol>
         <ClayLayout.ContentCol>
@@ -223,7 +253,9 @@ export default function ChatInput(props: Props) {
                     />
                     Choose from Docs & Media
                   </DropDown.Item>
-                  <DropDown.Item>
+                  <DropDown.Item onClick={() => {
+                    inputRef.current?.click();
+                  }}>
                     <ClayIcon className='mr-2' symbol='display' />
                     Upload from your computer
                   </DropDown.Item>
